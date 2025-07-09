@@ -106,9 +106,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
       }
       onOpenChange(false);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save product:", error);
-      // You might want to show an error toast here
+
+      // Check if it's a role-related error
+      if (
+        error?.message?.includes("seller") ||
+        error?.response?.data?.error?.includes("seller")
+      ) {
+        alert(
+          "Error: Only sellers can create products. Please make sure you're logged in with a seller account."
+        );
+      } else if (error?.response?.status === 403) {
+        alert("Error: You don't have permission to perform this action.");
+      } else if (error?.response?.status === 401) {
+        alert("Error: Please log in to continue.");
+      } else {
+        alert(
+          `Error: ${
+            error?.message || "Failed to save product. Please try again."
+          }`
+        );
+      }
     }
   };
 

@@ -95,8 +95,10 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        if not hasattr(user, 'role') or user.role != 'seller':
-            raise PermissionDenied("Only sellers can create products.")
+        if not hasattr(user, 'role'):
+            raise PermissionDenied("User role not found. Please contact support.")
+        if user.role != 'seller':
+            raise PermissionDenied(f"Only sellers can create products. Your current role is '{user.role}'. Please contact support to upgrade to a seller account.")
         serializer.save(user=user)
 
     def create(self, request, *args, **kwargs):
