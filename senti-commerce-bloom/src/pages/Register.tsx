@@ -209,6 +209,7 @@ const Register = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  minLength={8}
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
@@ -240,6 +241,7 @@ const Register = () => {
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   required
+                  minLength={8}
                   placeholder="Confirm Password"
                   value={formData.confirmPassword}
                   onChange={handleChange}

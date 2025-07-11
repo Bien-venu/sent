@@ -65,7 +65,7 @@ export const fetchMyReviews = createAsyncThunk(
   "reviews/fetchMyReviews",
   async () => {
     const response = await apiService.getMyReviews();
-    return response.data;
+    return response.data.results;
   }
 );
 

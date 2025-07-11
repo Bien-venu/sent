@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     try {
       await dispatch(
         addToCartAsync({
-          product_id: product.id,
+          product: product.id,
           quantity: 1,
         })
       ).unwrap();

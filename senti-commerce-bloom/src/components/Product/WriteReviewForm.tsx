@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import React, { useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
 import { Star, Send, Loader2 } from "lucide-react";
@@ -6,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { analyzeSentiment } from "../../lib/sentiment";
 import { createReview } from "@/features/reviews/reviewSlice";
-
+import { fetchMyReviews } from "@/features/reviews/reviewSlice";
 interface WriteReviewFormProps {}
 
 const WriteReviewForm: React.FC<WriteReviewFormProps> = () => {
@@ -45,6 +46,8 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = () => {
         title: "Review Submitted!",
         description: `Thank you for your feedback. We analyzed your review as ${sentiment}.`,
       });
+
+      dispatch(fetchMyReviews());
 
       // Reset form
       setRating(0);

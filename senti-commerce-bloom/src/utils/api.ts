@@ -2,6 +2,9 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {
@@ -24,6 +27,7 @@ export interface Category {
 }
 
 export interface Product {
+  product: any;
   id: number;
   product_name: string;
   description: string;
@@ -188,7 +192,7 @@ export const apiService = {
 
   // Cart Operations
   getCartItems: () => api.get<CartItem[]>("/carts/items/"),
-  addToCart: (data: { product_id: number; quantity: number }) =>
+  addToCart: (data: { product: number; quantity: number }) =>
     api.post("/carts/items/add/", data),
   updateCartQuantity: (data: { cart_item_id: number; quantity: number }) =>
     api.put("/carts/items/update-quantity/", data),
@@ -211,7 +215,7 @@ export const apiService = {
   updateReview: (id: number, data: Partial<Review>) =>
     api.patch<Review>(`/kikuu/reviews/${id}/`, data),
   deleteReview: (id: number) => api.delete(`/kikuu/reviews/${id}/`),
-  getMyReviews: () => api.get<Review[]>("/kikuu/my-reviews/"),
+  getMyReviews: () => api.get<Review[]>("/kikuu/reviews/"),
   getReviewsByRole: (role: "buyer" | "seller") =>
     api.get<Review[]>(`/kikuu/reviews/role/${role}/`),
   getReviewStats: () => api.get("/kikuu/reviews/stats/"),

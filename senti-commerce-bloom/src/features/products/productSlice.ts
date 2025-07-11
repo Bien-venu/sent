@@ -67,7 +67,7 @@ export const fetchProduct = createAsyncThunk(
   "products/fetchProduct",
   async (id: number) => {
     const response = await apiService.getProduct(id);
-    return response.data;
+    return response.data.product;
   }
 );
 

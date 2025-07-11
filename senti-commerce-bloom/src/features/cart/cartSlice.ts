@@ -41,7 +41,7 @@ export const fetchCartItems = createAsyncThunk(
 
 export const addToCartAsync = createAsyncThunk(
   "cart/addToCart",
-  async (data: { product_id: number; quantity: number }) => {
+  async (data: { product: number; quantity: number }) => {
     const response = await apiService.addToCart(data);
     return response.data;
   }

@@ -58,21 +58,6 @@ const FilterSidebar = () => {
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <select
-            value={filters.category}
-            onChange={(e) => dispatch(setCategory(e.target.value))}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
 
         {/* Price Range Filter */}
         <div>
@@ -107,7 +92,7 @@ const FilterSidebar = () => {
         {/* Rating Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-2 flex-wrap">
             {[1, 2, 3, 4, 5].map((rating) => (
               <Button
                 key={rating}

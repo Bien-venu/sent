@@ -13,7 +13,6 @@ class SentimentPipeline {
 
   static async getInstance() {
     if (this.instance === null) {
-      // @ts-ignore - This is a known workaround for a complex union type issue in the library.
       this.instance = await pipeline(this.task, this.model);
     }
     return this.instance;

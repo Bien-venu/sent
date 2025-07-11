@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Star,
@@ -30,10 +30,12 @@ import WriteReviewForm from "../components/Product/WriteReviewForm";
 import RelatedProducts from "../components/Product/RelatedProducts";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { fetchMyReviews } from "@/features/reviews/reviewSlice";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { selectedProduct } = useAppSelector((state) => state.products);
+  const { items } = useAppSelector((state) => state.reviews);
   const { items: wishlistItems } = useAppSelector((state) => state.wishlist);
   const dispatch = useAppDispatch();
   const [quantity, setQuantity] = useState(1);
@@ -41,6 +43,30 @@ const ProductDetail = () => {
     "all" | "positive" | "negative" | "neutral"
   >("all");
   const { toast } = useToast();
+  // Use useMemo to calculate sentiment counts efficiently
+  const sentimentCounts = useMemo(() => {
+    const counts = {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    };
+
+    items.forEach((review) => {
+      if (review.sentiment === "positive") {
+        counts.positive++;
+      } else if (review.sentiment === "neutral") {
+        counts.neutral++;
+      } else if (review.sentiment === "negative") {
+        counts.negative++;
+      }
+    });
+    return counts;
+  }, [items]); // Recalculate if 'items' array changes
+
+  useEffect(() => {
+    // Dispatch the async thunk action
+    dispatch(fetchMyReviews());
+  }, [dispatch]); // Add dispatch to the dependency array
 
   useEffect(() => {
     if (id) {
@@ -84,7 +110,7 @@ const ProductDetail = () => {
     try {
       await dispatch(
         addToCartAsync({
-          product_id: selectedProduct.id,
+          product: selectedProduct.id,
           quantity: quantity,
         })
       ).unwrap();
@@ -118,25 +144,27 @@ const ProductDetail = () => {
     }
   };
 
+  console.log("Reviews items:", items); // This will now show the array of review objects
+
   const sentimentChartData = [
     {
       name: "Positive",
-      value: selectedProduct.sentiment?.positive || 0,
+      value: sentimentCounts.positive,
       fill: "#22c55e",
     },
     {
       name: "Neutral",
-      value: selectedProduct.sentiment?.neutral || 0,
+      value: sentimentCounts.neutral,
       fill: "#f59e0b",
     },
     {
       name: "Negative",
-      value: selectedProduct.sentiment?.negative || 0,
+      value: sentimentCounts.negative,
       fill: "#ef4444",
     },
   ];
 
-  const filteredReviews = (selectedProduct.reviews || []).filter(
+  const filteredReviews = (items || []).filter(
     (review) =>
       sentimentFilter === "all" || review.sentiment === sentimentFilter
   );
@@ -208,7 +236,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-gray-600">
-                ({selectedProduct.reviews?.length || 0} reviews)
+                ({items?.length || 0} reviews)
               </span>
             </div>
 
@@ -338,19 +366,19 @@ const ProductDetail = () => {
 
               {filteredReviews.length > 0 ? (
                 <div className="space-y-6">
-                  {filteredReviews.map((review) => (
+                  {filteredReviews.map((review, index) => (
                     <div
-                      key={review.id}
+                      key={index}
                       className="bg-white rounded-lg shadow-md p-6 animate-fade-in"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <span className="font-semibold">
-                              {review.username}
+                              {review?.username}
                             </span>
                             <SentimentBadge
-                              sentiment={review.sentiment}
+                              sentiment={review?.sentiment}
                               size="sm"
                             />
                           </div>
@@ -360,7 +388,7 @@ const ProductDetail = () => {
                                 <Star
                                   key={i}
                                   className={`w-4 h-4 ${
-                                    i < review.rating
+                                    i < review?.rating
                                       ? "text-yellow-400 fill-current"
                                       : "text-gray-300"
                                   }`}
@@ -368,21 +396,23 @@ const ProductDetail = () => {
                               ))}
                             </div>
                             <span className="text-sm text-gray-500">
-                              {new Date(review.created_at).toLocaleDateString()}
+                              {new Date(
+                                review?.created_at
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
                       </div>
 
                       <p className="text-gray-700 leading-relaxed">
-                        {review.comment}
+                        {review?.comment}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="text-gray-600 text-center py-4">
-                  {(selectedProduct.reviews || []).length > 0
+                  {(items || []).length > 0
                     ? `No ${sentimentFilter} reviews. Try another filter!`
                     : "No reviews yet. Be the first to write one!"}
                 </p>
@@ -396,7 +426,7 @@ const ProductDetail = () => {
       {/* Related Products Section */}
       <RelatedProducts
         currentProductId={selectedProduct.id}
-        category={selectedProduct.category}
+        category={selectedProduct.category.toString()}
       />
     </div>
   );
